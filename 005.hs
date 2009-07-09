@@ -11,8 +11,8 @@ import Data.Set (empty, fromList, toList, union, fold, insert, Set)
 
 -- main1 is too slow
 --
-funs = [main3]
-prop_funs = funs ++ [main1]
+funs = [main1b, main3]
+prop_funs = funs ++ [main1, main1a]
 
 main = mapM_ (putStrLn . show) $
 	map (\f -> f 20) funs
@@ -21,15 +21,31 @@ main = mapM_ (putStrLn . show) $
 --
 prop_main = all (\f -> f 10 == 2520) prop_funs
 
--- Brutest force - Too slow
+-- Brutest force - Too slow - But is correct
 --
 main1 top = head [x| x <- [top .. high], all (\e -> x `mod` e == 0) set1]
 	where
 		set1 = [2 .. top]
 		high = product set1
 
+-- Brute force - Too slow - filters based on top interval
+--
+main1a top = head [x| x <- [top, top * 2 .. high], all (\e -> x `mod` e == 0) set1]
+	where
+		set1 = [2 .. top]
+		high = product set1
+
+-- Brute force - Too slow - filters based on prime-factor interval
+--
+main1b top = head [x| x <- [pfi, pfi * 2 .. high], all (\e -> x `mod` e == 0) set1]
+	where
+		set1 = [2 .. top]
+		high = product set1
+		pfi  = main2 top
+
 -- Primes - Takes a product of the prime factors set.
 -- Flawed idea - Doesn't take into account composite composition
+-- !!! But can be used for sub computation task
 --
 main2 top = product $ toList $ llSet $ pfList [2 .. top]
 	where
@@ -38,20 +54,9 @@ main2 top = product $ toList $ llSet $ pfList [2 .. top]
 		folder = \x y -> union x (fromList y)
 		pfList l = map primeFactors l
 
--- Primes - Takes a product of the non factor elements
--- Flawed idea - *shrug*
+-- DUH version
 --
-main3 :: Integer -> Integer
-main3 top = product ( toList ( removeFactors ( fromList [2 .. top] ) ) )
-	where
-		removeFactors :: Set Integer -> Set Integer
-		removeFactors l = fold folder empty l
-
-		folder :: Integer -> Set Integer -> Set Integer
-		folder e a = if (isUnique e a) then (insert e a) else a
-
-		isUnique :: Integer -> Set Integer -> Bool
-		isUnique e s = all (\ea -> ea `mod` e /= 0) $ toList s
+main3 top = foldl lcm 1 [2 .. top]
 
 -- Libraries
 --
