@@ -47,8 +47,7 @@ main4 = head [a*b*c| (a,b,c) <- triples, a+b+c == 1000]
 			l b = [b..1000]
 			sqrti = truncate . sqrt . fromIntegral 
 
-{---
- -
+{-
 -- Linear time (Piere)
 --
 main5 :: Integer
@@ -67,5 +66,6 @@ main5 = product $ find_triplet 1000
 						b1 || b2
 					]
 
+isInteger :: Float -> Bool
 isInteger x = truncate x == x
----}
+-}
