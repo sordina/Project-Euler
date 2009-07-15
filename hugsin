@@ -1,2 +1,2 @@
 :l 011.hs
-Test.QuickCheck.quickCheck prop_directionalize
+putStr "prop_takeEvery: " >> Test.QuickCheck.quickCheck prop_takeEvery

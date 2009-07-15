@@ -59,3 +59,13 @@ nonprimes = serve . foldTree mergeP . map multiples $ tail primes
     vip (x:xs)       = VIP x $ Crowd xs
     serve (VIP x xs) = x:serve xs
     serve (Crowd xs) = xs
+
+-- Slooooow, but quite simplistic
+primesWheel :: [Integer]
+primesWheel = primeSeq 2 []
+  where
+    primeSeq u ps
+      | all (\e -> u `mod` e /= 0) ps = u : (primeSeq u' $ ps ++ [u])
+      | otherwise = primeSeq u' ps
+      where
+        u' = u + 1
