@@ -1,2 +1,0 @@
-:l 011.hs
-putStr "prop_takeEvery: " >> Test.QuickCheck.quickCheck prop_takeEvery
