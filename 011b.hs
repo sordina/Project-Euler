@@ -1,29 +1,29 @@
 module Main (main)
 where
+import CropEnd
 
 main :: IO ()
 main = do
 	matrixString <- readMatrixString
 	rowMatrix <- return $ parse matrixString
-	diagonalMatrix <- return $ roberize rowMatrix
+	diagonalMatrix <- return $ rOffset (-1) rowMatrix
 	flat <- return $ flatten rowMatrix
 	print $ columnizeNieve rowMatrix
 
-skew :: Integer -> Integer -> [[a]] -> [[a]]
-skew offset rowMatrix = cm 0 rowMatrix []
+rOffset :: Int -> [[a]] -> [[a]]
+rOffset _ [] = []
+rOffset offset rows = build 0 offset rows
 	where
-		cm n [] complete = complete
-		cm n todo@(row:rest) done = cm n' rest $ join n row done
-			where
-				n' = n + 1
-				join n
-					| n < 0 = join' n row done
-						where
-							join' n row [] = map (:[]) dropped
-							join' n row done = zipWith (\r d -> d ++ [r]) dropped done
-								where
-									dropped = drop (n*offset) row
-					| otherwise =
+		build :: Int -> Int -> [a] -> [a]
+		build upto offset rows = cropped ~~~ build (upto + 1) offset cropped
+			where cropped
+				| offset < 0 = drop (offset * upto) rows
+				| otherwise  = cropEnd (offset * upto) rows
+
+(~~~) :: [a] -> [a] -> [a]
+[] ~~~ _ = []
+prev ~~~ [] = prev
+(hp:prev) ~~~ (hn:next) = hp:[hn:(prev~~~next)]
 
 {---
  - A function that takes a row based matrix and converts
