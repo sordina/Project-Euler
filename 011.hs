@@ -1,12 +1,12 @@
 module Main-- (main)
 where
 import Matrix
+import qualified Rows as R
 import qualified Data.List as DL
 
 main :: IO ()
 main = do
-	matrixString <- readMatrixString
-	rows     <- return $ parse matrixString
+	rows     <- R.rows "011_matrix.txt"
 	columns  <- return $ DL.transpose rows
 	diags    <- return $ diagonals rows
 	combined <- return $ rows ++ columns ++ diags
@@ -45,15 +45,3 @@ diagonals rows
 			diagonalRight . DL.transpose,
 			diagonalRight . DL.transpose . reverse
 		]
-
-parse :: String -> [[Integer]]
-parse string = map parseLine rowStrings
-	where
-		rowStrings :: [String]
-		rowStrings = lines string
-
-		parseLine :: String -> [Integer]
-		parseLine line = map read $ words line
-
-readMatrixString :: IO String
-readMatrixString = readFile "011_matrix.txt"
