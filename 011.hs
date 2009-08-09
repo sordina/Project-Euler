@@ -10,7 +10,6 @@ main = do
 	columns  <- return $ DL.transpose rows
 	diags    <- return $ diagonals rows
 	combined <- return $ rows ++ columns ++ diags
-	print combined
 	maximum  <- return $ search combined
 	--
 	-- And now for something completely different:
