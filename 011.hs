@@ -1,115 +1,51 @@
-{---
- -
- - In the 20×20 grid below, four numbers along a diagonal line have been marked in red.
- - (Surrounded by '[]' in ASCII)
- -
- - 08 02 22 97 38 15 00 40 00 75 04 05 07 78 52 12 50 77 91 08
- - 49 49 99 40 17 81 18 57 60 87 17 40 98 43 69 48 04 56 62 00
- - 81 49 31 73 55 79 14 29 93 71 40 67 53 88 30 03 49 13 36 65
- - 52 70 95 23 04 60 11 42 69 24 68 56 01 32 56 71 37 02 36 91
- - 22 31 16 71 51 67 63 89 41 92 36 54 22 40 40 28 66 33 13 80
- - 24 47 32 60 99 03 45 02 44 75 33 53 78 36 84 20 35 17 12 50
- - 32 98 81 28 64 23 67 10[26]38 40 67 59 54 70 66 18 38 64 70
- - 67 26 20 68 02 62 12 20 95[63]94 39 63 08 40 91 66 49 94 21
- - 24 55 58 05 66 73 99 26 97 17[78]78 96 83 14 88 34 89 63 72
- - 21 36 23 09 75 00 76 44 20 45 35[14]00 61 33 97 34 31 33 95
- - 78 17 53 28 22 75 31 67 15 94 03 80 04 62 16 14 09 53 56 92
- - 16 39 05 42 96 35 31 47 55 58 88 24 00 17 54 24 36 29 85 57
- - 86 56 00 48 35 71 89 07 05 44 44 37 44 60 21 58 51 54 17 58
- - 19 80 81 68 05 94 47 69 28 73 92 13 86 52 17 77 04 89 55 40
- - 04 52 08 83 97 35 99 16 07 97 57 32 16 26 26 79 33 27 98 66
- - 88 36 68 87 57 62 20 72 03 46 33 67 46 55 12 32 63 93 53 69
- - 04 42 16 73 38 25 39 11 24 94 72 18 08 46 29 32 40 62 76 36
- - 20 69 36 41 72 30 23 88 34 62 99 69 82 67 59 85 74 04 36 16
- - 20 73 35 29 78 31 90 01 74 31 49 71 48 86 81 16 23 57 05 54
- - 01 70 54 71 83 51 54 69 16 92 33 48 61 43 52 01 89 19 67 48
- -
- - The product of these numbers is 26 × 63 × 78 × 14 = 1788696.
- -
- - What is the greatest product of four adjacent numbers
- - in any direction (up, down, left, right, or diagonally) in the 20×20 grid?
- -
- ---}
-
-module Main (main)
+module Main-- (main)
 where
+import Matrix
+import qualified Data.List as DL
 
 main :: IO ()
 main = do
 	matrixString <- readMatrixString
-	rowMatrix <- return $ parse matrixString
-	flat <- return $ flatten rowMatrix
-	print $ columnizeNieve rowMatrix
+	rows     <- return $ parse matrixString
+	columns  <- return $ DL.transpose rows
+	diags    <- return $ diagonals rows
+	combined <- return $ rows ++ columns ++ diags
+	print combined
+	maximum  <- return $ search combined
+	--
+	-- And now for something completely different:
+	--
+	print maximum
 
-diagonal1 :: [[a]] -> [[a]]
-diagonal1 rows@(h:_) = directionalize (rl + 1) $ flatten rows
-	where rl = length h
+search :: [[Integer]] -> Integer
+search directions = max' $ map searchDirection directions
 
-diagonal2 :: [[a]] -> [[a]]
-diagonal2 rows@(h:_) = directionalize (rl - 1) $ flatten rows
-	where rl = length h
-
-
-columns :: [[a]] -> [[a]]
-columns rows@(h:_) = directionalize rl $ flatten rows
-	where rl = length h
-
-directionalize :: Int -> [a] -> [[a]]
-directionalize n list = map mapper [0..(n-1)]
-	where
-		mapper x = takeEvery n $ drop x list
-
-takeEvery :: Int -> [a] -> [a]
-takeEvery n [] = []
-takeEvery n l = head l : (takeEvery n $ drop n l)
-
-{-
-takeEvery :: Int -> [a] -> [[a]]
-takeEvery _ [] = []
-takeEvery n list = t list []
-	where
-		back = drop n
-		front = take n
-		t :: [a] -> [[a]] -> [[a]]
-		-- Find a way to do this without reversing
-		t [] done = map reverse done
-		t xs   [] = t (back xs) $ map (:[]) (front xs)
-		t xs done = t (back xs) $ zipWith (:) (front xs) done
--}
-
-prop_takeEvery :: Bool
-prop_takeEvery = takeEvery 3 string == done
-	where
-		string = [1..9]
-		done = [1,4,7]
-
-prop_directionalize :: Bool
-prop_directionalize = directionalize 3 string == done
-	where
-		string = [1..9]
-		done = [[1,4,7],[2,5,8],[3,6,9]]
+searchDirection :: [Integer] -> Integer
+searchDirection set = max' (map product $ buildRuns set)
 
 {---
- - A function that takes a row based matrix and converts
- - it to a column based matrix.
- - This is sub-optimal as it doesn't work on the tail.
- - It is, however, useful for property verification.
+ - This is a shocking implementation of max'
  ---}
-columnizeNieve :: [[a]] -> [[a]]
-columnizeNieve rowMatrix = cm rowMatrix []
-	where
-		cm [] complete = complete
-		cm todo@(row:rest) done = cm rest $ join row done
-			where
-				join row [] = map (:[]) row
-				join row done = zipWith (\r d -> d ++ [r]) row done
+max' :: [Integer] -> Integer
+max' = foldl max 0
 
-flatten :: [[a]] -> [a]
-flatten deep = f deep []
+buildRuns :: [Integer] -> [[Integer]]
+buildRuns set = extract $ foldl f (1,[],[]) set
 	where
-		f :: [[a]] -> [a] -> [a]
-		f [] done = done
-		f (x:xs) done = f xs $ done ++ x
+		extract (_,_,result) = result
+		f (n, [],       done) y = (n+1, [y], [])
+		f (n, l@(x:xs), done) y
+			| n < 5     = (n+1, l  ++ [y], [])
+			| otherwise = (n,   xs ++ [y], l:done)
+
+diagonals :: [[x]] -> [[x]]
+diagonals rows
+	= concatMap (\f -> f rows) [
+			diagonalRight,
+			diagonalRight . reverse,
+			diagonalRight . DL.transpose,
+			diagonalRight . DL.transpose . reverse
+		]
 
 parse :: String -> [[Integer]]
 parse string = map parseLine rowStrings
