@@ -1,51 +1,51 @@
-module Main (main)
+module Main-- (main)
 where
-import CropEnd
+import Matrix
+import qualified Data.List as DL
 
 main :: IO ()
 main = do
 	matrixString <- readMatrixString
-	rowMatrix <- return $ parse matrixString
-	diagonalMatrix <- return $ rOffset (-1) rowMatrix
-	flat <- return $ flatten rowMatrix
-	print $ columnizeNieve rowMatrix
+	rows     <- return $ parse matrixString
+	columns  <- return $ DL.transpose rows
+	diags    <- return $ diagonals rows
+	combined <- return $ rows ++ columns ++ diags
+	print combined
+	maximum  <- return $ search combined
+	--
+	-- And now for something completely different:
+	--
+	print maximum
 
-rOffset :: Int -> [[a]] -> [[a]]
-rOffset _ [] = []
-rOffset offset rows = build 0 offset rows
-	where
-		build :: Int -> Int -> [a] -> [a]
-		build upto offset rows = cropped ~~~ build (upto + 1) offset cropped
-			where cropped
-				| offset < 0 = drop (offset * upto) rows
-				| otherwise  = cropEnd (offset * upto) rows
+search :: [[Integer]] -> Integer
+search directions = max' $ map searchDirection directions
 
-(~~~) :: [a] -> [a] -> [a]
-[] ~~~ _ = []
-prev ~~~ [] = prev
-(hp:prev) ~~~ (hn:next) = hp:[hn:(prev~~~next)]
+searchDirection :: [Integer] -> Integer
+searchDirection set = max' (map product $ buildRuns set)
 
 {---
- - A function that takes a row based matrix and converts
- - it to a column based matrix.
- - This is sub-optimal as it doesn't work on the tail.
- - It is, however, useful for property verification.
+ - This is a shocking implementation of max'
  ---}
-columnizeNieve :: [[a]] -> [[a]]
-columnizeNieve rowMatrix = cm rowMatrix []
-	where
-		cm [] complete = complete
-		cm todo@(row:rest) done = cm rest $ join row done
-			where
-				join row [] = map (:[]) row
-				join row done = zipWith (\r d -> d ++ [r]) row done
+max' :: [Integer] -> Integer
+max' = foldl max 0
 
-flatten :: [[a]] -> [a]
-flatten deep = f deep []
+buildRuns :: [Integer] -> [[Integer]]
+buildRuns set = extract $ foldl f (1,[],[]) set
 	where
-		f :: [[a]] -> [a] -> [a]
-		f [] done = done
-		f (x:xs) done = f xs $ done ++ x
+		extract (_,_,result) = result
+		f (n, [],       done) y = (n+1, [y], [])
+		f (n, l@(x:xs), done) y
+			| n < 5     = (n+1, l  ++ [y], [])
+			| otherwise = (n,   xs ++ [y], l:done)
+
+diagonals :: [[x]] -> [[x]]
+diagonals rows
+	= concatMap (\f -> f rows) [
+			diagonalRight,
+			diagonalRight . reverse,
+			diagonalRight . DL.transpose,
+			diagonalRight . DL.transpose . reverse
+		]
 
 parse :: String -> [[Integer]]
 parse string = map parseLine rowStrings
