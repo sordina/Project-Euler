@@ -1,0 +1,31 @@
+	Thu Sep 17 03:59 2009 Time and Allocation Profiling Report  (Final)
+
+	   014 +RTS -p -RTS
+
+	total time  =        0.32 secs   (16 ticks @ 20 ms)
+	total alloc = 544,853,800 bytes  (excludes profiling overheads)
+
+COST CENTRE                    MODULE               %time %alloc
+
+numeric                        Main                 100.0   99.1
+
+
+                                                                                               individual    inherited
+COST CENTRE              MODULE                                               no.    entries  %time %alloc   %time %alloc
+
+MAIN                     MAIN                                                   1           0   0.0    0.0   100.0  100.0
+ CAF                     Main                                                 166          13   0.0    0.0   100.0  100.0
+  b                      Main                                                 182           1   0.0    0.0    31.2   33.1
+   go                    Main                                                 183           1   0.0    0.3    31.2   33.1
+    numeric              Main                                                 185           0  31.2   32.8    31.2   32.8
+  a                      Main                                                 178           1   0.0    0.0    18.8   15.3
+   go                    Main                                                 179           1   0.0    0.2    18.8   15.3
+    numeric              Main                                                 181           0  18.8   15.2    18.8   15.2
+  numeric                Main                                                 176           1   0.0    0.0     0.0    0.0
+  myMaximum              Main                                                 175           1   0.0    0.0     0.0    0.0
+  c                      Main                                                 173           1   0.0    0.0    50.0   51.6
+   go                    Main                                                 174           1   0.0    0.5    50.0   51.6
+    numeric              Main                                                 177           0  50.0   51.1    50.0   51.1
+  main                   Main                                                 172           1   0.0    0.0     0.0    0.0
+ CAF                     GHC.Handle                                           117           2   0.0    0.0     0.0    0.0
+ CAF                     GHC.Conc                                             116           1   0.0    0.0     0.0    0.0

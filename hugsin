@@ -1,0 +1,2 @@
+:l 014.hs
+putStr "prop_numeric: " >> Test.QuickCheck.quickCheck prop_numeric
