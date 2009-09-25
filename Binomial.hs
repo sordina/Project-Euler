@@ -1,4 +1,20 @@
-choose :: Integer -> Integer -> Integer
-choose _ 0 = 1
-choose 0 _ = 0
-choose (m+1) (n+1) = (choose m n) * (m+1) `div` (n+1)
+module Binomial (binomial)
+where
+
+import Factorial
+import Control.Arrow ((&&&))
+
+binomial :: Integer -> Integer -> Integer
+
+binomial top bottom = top' `div` bottom'
+  where
+    top' = factorial top
+    bottom' = left * right
+      where
+        left = factorial bottom
+        right = factorial (top - bottom)
+
+main = mapM_ printer list
+  where
+    printer = print . (uncurry binomial &&& id)
+    list = [(top,bottom) | top<-[2..10], bottom <- [2..top]]
