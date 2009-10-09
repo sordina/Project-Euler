@@ -1,2 +1,0 @@
-:l 015.hs
-putStr "prop_paths2: " >> Test.QuickCheck.quickCheck prop_paths2

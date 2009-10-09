@@ -1,0 +1,39 @@
+	Wed Oct  7 18:25 2009 Time and Allocation Profiling Report  (Final)
+
+	   018 +RTS -p -RTS
+
+	total time  =        0.02 secs   (1 ticks @ 20 ms)
+	total alloc =  12,929,720 bytes  (excludes profiling overheads)
+
+COST CENTRE                    MODULE               %time %alloc
+
+solve                          Main                 100.0   19.3
+triangle'                      Main                   0.0    3.5
+triangle                       Main                   0.0   77.0
+
+
+                                                                                               individual    inherited
+COST CENTRE              MODULE                                               no.    entries  %time %alloc   %time %alloc
+
+MAIN                     MAIN                                                   1           0   0.0    0.0   100.0  100.0
+  t2                     Main                                                 181           0   0.0    0.0     0.0    0.0
+   triangleFile'         Main                                                 182           0   0.0    0.0     0.0    0.0
+  triangleFile'          Main                                                 180           0   0.0    0.0     0.0    0.0
+ CAF                     Main                                                 164          11   0.0    0.0   100.0  100.0
+  t2                     Main                                                 177           1   0.0    0.0     0.0    3.4
+   triangleFile'         Main                                                 178           0   0.0    0.1     0.0    3.4
+    triangle'            Main                                                 179           0   0.0    3.3     0.0    3.3
+  triangle'              Main                                                 175           1   0.0    0.2     0.0    0.2
+  triangleFile'          Main                                                 172           1   0.0    0.0     0.0    0.0
+  t1                     Main                                                 171           1   0.0    0.0     0.0    0.0
+  main                   Main                                                 170           1   0.0    0.0   100.0   96.3
+   triangle              Main                                                 174       65566   0.0   77.0     0.0   77.0
+   solve                 Main                                                 173       65566 100.0   19.3   100.0   19.3
+ CAF                     Data.Typeable                                        162           1   0.0    0.0     0.0    0.0
+ CAF                     GHC.IOBase                                           140           3   0.0    0.0     0.0    0.0
+ CAF                     GHC.Read                                             138           1   0.0    0.0     0.0    0.0
+ CAF                     Text.Read.Lex                                        131           8   0.0    0.0     0.0    0.0
+ CAF                     Data.HashTable                                       117           2   0.0    0.0     0.0    0.0
+ CAF                     GHC.Handle                                           115           5   0.0    0.0     0.0    0.0
+  triangleFile'          Main                                                 176           0   0.0    0.0     0.0    0.0
+ CAF                     GHC.Conc                                             114           1   0.0    0.0     0.0    0.0
