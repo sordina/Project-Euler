@@ -1,0 +1,7 @@
+Parse error:
+  Ord a = -
+        ^
+(line 1, column 7):
+unexpected "="
+expecting "forall", "(", "[", "!", "--", "/" or end of input
+Bad symbol
