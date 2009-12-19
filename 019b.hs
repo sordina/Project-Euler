@@ -1,14 +1,14 @@
-import Data.List
+import Control.Monad (guard)
 
 answer :: Integer
 answer = fromIntegral $ length valid_days
 
 valid_days :: [Day]
-valid_days = [
-  day | day <- twentieth_centuary,
-    is_sunday day,
-    is_first_day_of_month day
-  ]
+valid_days = do
+  day <- twentieth_centuary
+  guard $ is_sunday day
+  guard $ is_first_day_of_month day
+  return day
 
 days :: [Day]
 days = iterate next_day (1900, January, 1, Monday)
@@ -95,19 +95,22 @@ is_sunday (_, _, _, Sunday) = True
 is_sunday _                 = False
 
 month_days :: LeapYear -> Month -> Days
-month_days _     January   = 31
-month_days True  Febuary   = 29
-month_days False Febuary   = 28
-month_days _     March     = 31
+
+month_days _     September = 30
 month_days _     April     = 30
-month_days _     May       = 31
 month_days _     June      = 30
+month_days _     November  = 30
+
+month_days _     January   = 31
+month_days _     March     = 31
+month_days _     May       = 31
 month_days _     July      = 31
 month_days _     August    = 31
-month_days _     September = 31
 month_days _     October   = 31
-month_days _     November  = 30
 month_days _     December  = 31
+
+month_days False Febuary   = 28
+month_days True  Febuary   = 29
 
 type Days = Integer
 type LeapYear = Bool
