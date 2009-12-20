@@ -1,5 +1,7 @@
 import Control.Monad (guard)
 
+main = print answer
+
 answer :: Integer
 answer = fromIntegral $ length valid_days
 
