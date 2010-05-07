@@ -17,4 +17,4 @@ binomial top bottom = top' `div` bottom'
 main = mapM_ printer list
   where
     printer = print . (uncurry binomial &&& id)
-    list = [(top,bottom) | top<-[2..10], bottom <- [2..top]]
+    list = [(top,bottom) | top <- [2..10], bottom <- [2..top]]

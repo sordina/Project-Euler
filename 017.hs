@@ -2,11 +2,9 @@
 {- Problem 17 -}
 ----------------
 
-
 -- Main Program
 --
 main = print $ solve [1..1000]
-
 
 -- Properties
 --
@@ -15,11 +13,9 @@ prop_solve = solve [1..5] == 19
 prop_english = (l 342 == 23) && (l 115 == 20)
   where l = length . english
 
-
 -- Library Types
 --
 one_9, one_19, twenty_99, one_99, one_999 :: [String]
-
 
 -- Library Definitions
 --

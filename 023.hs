@@ -31,7 +31,10 @@ abundant_numbers = do
   return natural
 
 -- As 12 is the smallest abundant number
-prop_first_abundant_number = 12 == head abundant_numbers
+prop_first_abundant_number = and $ zipWith (==) abb abundant_numbers
+  where
+    -- Wikipedia: http://en.wikipedia.org/wiki/Abundant_number
+    abb = [12, 18, 20, 24, 30, 36, 40, 42, 48, 54, 56, 60, 66, 70, 72, 78, 80, 84, 88, 90, 96, 100]
 
 -- TODO: Optimize
 -- Build a list of lists of divisors

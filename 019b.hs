@@ -59,21 +59,19 @@ type Day = (Year, Month, Day_of_month, Weekday_name)
 type Year = Integer
 
 data Month = January | Febuary | March | April | May | June | July | August | September | October | November | December
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord, Enum, Show)
 
 next_month :: Month -> Month
-next_month January   = Febuary
-next_month Febuary   = March
-next_month March     = April
-next_month April     = May
-next_month May       = June
-next_month June      = July
-next_month July      = August
-next_month August    = September
-next_month September = October
-next_month October   = November
-next_month November  = December
-next_month December  = January
+next_month = lookup_next $ enumFrom January
+
+lookup_next :: (Eq a) => [a] -> a -> a
+lookup_next l = lookup (cycle l) (cycle $ tail l)
+  where
+    lookup (a:as) (b:bs) c
+      | a == c = b
+      | otherwise = lookup as bs c
+
+    lookup _ _ _ = error "Impossible"
 
 is_first_day_of_month (_, _, 1, _) = True
 is_first_day_of_month _            = False
@@ -81,16 +79,10 @@ is_first_day_of_month _            = False
 type Day_of_month = Integer
 
 data Weekday_name = Monday | Tuesday | Wednesday | Thursday | Friday | Saturday | Sunday
-  deriving (Eq, Show)
+  deriving (Eq, Enum, Show)
 
 next_week_day :: Weekday_name -> Weekday_name
-next_week_day Monday    = Tuesday
-next_week_day Tuesday   = Wednesday
-next_week_day Wednesday = Thursday
-next_week_day Thursday  = Friday
-next_week_day Friday    = Saturday
-next_week_day Saturday  = Sunday
-next_week_day Sunday    = Monday
+next_week_day = lookup_next $ enumFrom Monday
 
 is_sunday :: Day -> Bool
 is_sunday (_, _, _, Sunday) = True
