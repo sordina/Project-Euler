@@ -7,3 +7,5 @@ perms xs = do
   map (x:) (perms $ delete x xs)
         
 answer = (perms "0123456789") !! 999999
+
+main = print answer
