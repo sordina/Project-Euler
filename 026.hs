@@ -1,4 +1,5 @@
 import Data.Maybe (fromMaybe)
+import Prime
 
 divide :: Integral a => a -> a -> String
 divide num den
@@ -35,5 +36,5 @@ sort' f = foldl1 folder
       | GT == compare (f o) (f i) = o
       | otherwise = i
 
-answer = sort' (period 1) [1..1000]
+answer = sort' (period 1) (takeWhile (<1000) primes)
 main = print answer
