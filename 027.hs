@@ -1,20 +1,9 @@
-{-# LANGUAGE BangPatterns #-}
-
 import Prime (isPrime)
 import Primes
 import Data.List (maximumBy)
 
 formula :: Integer -> Integer -> Integer -> Integer
 formula a b = \n -> (n^2) + (a*n) + b
-
-prop_formula_a = 40 == nPrimes euler
-  where euler = map (formula 1 41) [0..]
-
-prop_formula_b = 80 == nPrimes computer
-  where computer = map (formula (-79) 1601) [0..]
-
-prop_formula_c = and (map isPrime computer)
-  where computer = map (formula (-79) 1601) [0..79]
 
 primeMakers :: [(Integer,Integer,Integer)]
 primeMakers = do
@@ -37,3 +26,14 @@ main :: IO ()
 main = do
   (x,y,_) <- return answer
   print $ x * y
+
+-- Properties
+--
+prop_formula_a = 40 == nPrimes euler
+  where euler = map (formula 1 41) [0..]
+
+prop_formula_b = 80 == nPrimes computer
+  where computer = map (formula (-79) 1601) [0..]
+
+prop_formula_c = and (map isPrime computer)
+  where computer = map (formula (-79) 1601) [0..79]
