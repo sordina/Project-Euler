@@ -14,7 +14,7 @@ cross = c 1
       | otherwise       = c (n+1)
 
 -- Upper limit for the search domain.
-limit = 10 ^ cross - 1
+limit = sMax cross
 
 numbers :: [Int]
 numbers = filter (\n -> n == g n) [2 .. limit]
