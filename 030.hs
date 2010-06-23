@@ -1,3 +1,5 @@
+import Data.Char (digitToInt)
+
 -- First define the search bounds.
 
 -- Maximum power sum for a particular number of digits.
@@ -19,7 +21,7 @@ limit = sMax cross
 numbers :: [Int]
 numbers = filter (\n -> n == g n) [2 .. limit]
   where
-    g = sum . map ((^5) . read . (:[])) . show
+    g = sum . map ((^5) . digitToInt) . show
 
 answer = sum numbers
 
