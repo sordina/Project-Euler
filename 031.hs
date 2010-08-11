@@ -28,7 +28,8 @@ g h n = unions . L.map f $ available
     f a = map (L.insertBy compare a) (h (n-a))
     available = L.filter (<= n) divisions
 
-memoFix :: ((a -> b) -> a -> b)-> ((a -> b) -> (a -> b)) -> a -> b
+type MFB a b = (a -> b) -> a -> b
+memoFix :: MFB a b -> MFB a b -> a -> b
 memoFix mem f = let mf = mem (f mf) in mf
 
 g'   = fix g              -- Very slow
