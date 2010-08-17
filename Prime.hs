@@ -33,8 +33,8 @@ mergeP xs@(Crowd ~(x:xt)) ys@(VIP y yt) = case compare x y of
     LT -> VIP x $ mergeP (Crowd xt) ys
     EQ -> VIP x $ mergeP (Crowd xt) yt
     GT -> VIP y $ mergeP xs yt
- 
- 
+
+
 merge :: Ord a => [a] -> [a] -> [a]
 merge xs@(x:xt) ys@(y:yt) = case compare x y of
     LT -> x : merge xt ys
