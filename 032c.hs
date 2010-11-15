@@ -14,7 +14,7 @@ swap (a,b) = (b,a)
 explode :: (Integral a) => a -> [a]
 explode = unfoldr (\a -> if a==0 then Nothing else Just . swap $ quotRem a 10)
 
-pandigiticals =
+pandigitals =
   nub $ do (beg,end) <- combs 5 [1..9]
            n <- [1,2]
            let (a,b) = splitAt n beg
@@ -22,4 +22,4 @@ pandigiticals =
            guard $ sort (explode res) == end
            return res
 
-problem_32 = sum pandigiticals
+problem_32 = sum pandigitals

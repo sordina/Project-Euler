@@ -1,6 +1,6 @@
 module Primes (
-  module NumberTheory.Sieve.ONeill
+  module Math.Sieve.ONeill
 ) where
 
-import NumberTheory.Sieve.ONeill (primes)
-import NumberTheory.Sieve.Phi (isPrime)
+import Math.Sieve.ONeill (primes)
+import Math.Sieve.Phi (isPrime)
