@@ -15,7 +15,7 @@ prop :: Integral n => [n] -> Bool
 prop xs = all (==0) divisions
   where
     rows      = map (mult . map ((xs!!) . subtract 1)) set
-    divisions = zipWith mod rows primes
+    divisions = zipWith mod rows primes         
 
 mult :: Integral n => [n] -> n
 mult = sum . zipWith (*) (iterate (*10) 1) . reverse
