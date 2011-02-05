@@ -8,21 +8,21 @@ hexagon  n = n*(2*n-1)
 
 is_pentagonal = is_something pentagon
 
-is_something f n = is_s_low 1
+is_something f n = low 1
   where
 
-    is_s_low b
+    low b
       | r == n    = True
-      | r >  n    = is_s_high (b `div` 2) b
-      | otherwise = is_s_low  (b*2)
+      | r >  n    = high (b `div` 2) b
+      | otherwise = low  (b*2)
       where
         r = f b
 
-    is_s_high l h
+    high l h
       | n == r    = True
       | m == l    = False
-      | n >= r    = is_s_high m h
-      | otherwise = is_s_high l m
+      | n >= r    = high m h
+      | otherwise = high l m
       where
         m = (l+h) `div` 2
         r = f m
