@@ -2,8 +2,7 @@ module Main (main)
 where
 
 main :: IO ()
-main = putStrLn . show $
-	mapM_ (\f -> f 100) [main1]
+main = mapM_ (print.($100)) [main1]
 
 main1 n = (squareSum $ natural n) - (sumSquares $ natural n)
 
