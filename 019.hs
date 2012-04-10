@@ -1,69 +1,62 @@
-main = print solve
+import Control.Arrow
 
-years = [1900..]
+data Month = January
+           | February
+           | March
+           | April
+           | May
+           | June
+           | July
+           | August
+           | September
+           | October
+           | November
+           | December
+           deriving (Show, Enum, Bounded)
 
-months = cycle $ enumFrom January
+data Day = Monday
+         | Tuesday
+         | Wednesday
+         | Thursday
+         | Friday
+         | Saturday
+         | Sunday
+         deriving (Show, Enum, Bounded)
 
-solve = length [ day | (day,weekday) <- days
-                     , weekday == Sunday
-                     , day >= (fromDate 1 1 1)
-                     , day <= (fromDate 2000 12 31)
-                     ]
+monthDays January   _     = 31
+monthDays February  True  = 29
+monthDays February  False = 28
+monthDays March     _     = 31
+monthDays April     _     = 30
+monthDays May       _     = 31
+monthDays June      _     = 30
+monthDays July      _     = 31
+monthDays August    _     = 31
+monthDays September _     = 30
+monthDays October   _     = 31
+monthDays November  _     = 30
+monthDays December  _     = 31
 
-fromDate :: Integer -> Integer -> Integer -> Integer
-fromDate year month day = head [ day | day <- days, day == (year, month, day) ]
+main = print $ length $ filter id $ map valid dayItems
 
-is_leap year
-  | year `mod` 400 == 0 = False
-  | year `mod` 4   == 0 = True
-  | otherwise           = False
+valid (Sunday, 1) = True
+valid _           = False
 
-month_lengths :: Bool -> [(Month,Integer)]
-month_lengths leap = [
-  (January, 31)
-  (Febuary, febuary_length leap)
-  (March, 31)
-  (April, 30)
-  (May, 31)
-  (June, 30)
-  (July, 31)
-  (August, 31)
-  (September, 30)
-  (October, 31)
-  (November, 30)
-  (December, 31)
-  ]
+dayItems = zip (cycle days) monthItems
 
-febuary_length True = 29
-febuary_length False = 28
+days = enumFrom minBound
 
-weekdays = repeat $ enumFrom Monday
+monthItems = concat [ take (monthDays m l) [1..] | l <- leapYears, m <- months ]
 
-days :: [(Integer, Day)]
-days = undefined
+leapYears = map isLeapYear years
 
-data Day =
-    Monday
-    | Tuesday
-    | Wednesday
-    | Thursday
-    | Friday
-    | Saturday
-    | Sunday
-    deriving (Enum, Show, Eq)
+months = enumFrom minBound
 
-data Month =
-  January
-  | Febuary
-  | March
-  | April
-  | May
-  | June
-  | July
-  | August
-  | September
-  | October
-  | November
-  | December
-  deriving (Enum, Show, Eq)
+years = [1900..2000]
 
+a `divides` b = b `mod` a == 0
+
+isLeapYear n | 400 `divides` n = True
+             | 100 `divides` n = False
+             | 4   `divides` n = True
+             | otherwise       = False
