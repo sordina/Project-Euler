@@ -4,15 +4,11 @@ years = [1900..]
 
 months = cycle $ enumFrom January
 
-genMonths year = 
-
-solve = length
-[ day
-  | (day,weekday) <- days,
-  weekday == Sunday,
-  day >= (fromDate 1 1 1),
-    day <= (fromDate 2000 12 31)
-    ]
+solve = length [ day | (day,weekday) <- days
+                     , weekday == Sunday
+                     , day >= (fromDate 1 1 1)
+                     , day <= (fromDate 2000 12 31)
+                     ]
 
 fromDate :: Integer -> Integer -> Integer -> Integer
 fromDate year month day = head [ day | day <- days, day == (year, month, day) ]
@@ -43,19 +39,20 @@ febuary_length False = 28
 
 weekdays = repeat $ enumFrom Monday
 
-days = 
+days :: [(Integer, Day)]
+days = undefined
 
 data Day =
-  Monday
-  | Tuesday
-  | Wednesday
-  | Thursday
-  | Friday
-  | Saturday
-  | Sunday
-  deriving (Enum, Show, Eq)
+    Monday
+    | Tuesday
+    | Wednesday
+    | Thursday
+    | Friday
+    | Saturday
+    | Sunday
+    deriving (Enum, Show, Eq)
 
-data Month = 
+data Month =
   January
   | Febuary
   | March
