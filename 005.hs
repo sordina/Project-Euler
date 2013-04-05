@@ -23,21 +23,21 @@ prop_main = all (\f -> f 10 == 2520) prop_funs
 
 -- Brutest force - Too slow - But is correct
 --
-main1 top = head [x| x <- [top .. high], all (\e -> x `mod` e == 0) set1]
+main1 top = head [ x | x <- [top .. high], all (\e -> x `mod` e == 0) set1]
 	where
 		set1 = [2 .. top]
 		high = product set1
 
 -- Brute force - Too slow - filters based on top interval
 --
-main1a top = head [x| x <- [top, top * 2 .. high], all (\e -> x `mod` e == 0) set1]
+main1a top = head [ x | x <- [top, top * 2 .. high], all (\e -> x `mod` e == 0) set1]
 	where
 		set1 = [2 .. top]
 		high = product set1
 
 -- Brute force - Too slow - filters based on prime-factor interval
 --
-main1b top = head [x| x <- [pfi, pfi * 2 .. high], all (\e -> x `mod` e == 0) set1]
+main1b top = head [ x | x <- [pfi, pfi * 2 .. high], all (\e -> x `mod` e == 0) set1]
 	where
 		set1 = [2 .. top]
 		high = product set1
