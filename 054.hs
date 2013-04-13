@@ -143,10 +143,9 @@ maybeFail :: Maybe a -> CardA a
 maybeFail (Just a) = return a
 maybeFail Nothing  = mzero
 
+-- Why doesn't this exist already?
 deleteWhen :: (a -> Bool) -> [a] -> [a]
-deleteWhen _ []                 = []
-deleteWhen f (x:xs) | f x       = xs
-                    | otherwise = x : deleteWhen f xs
+deleteWhen f = uncurry (++) . (id *** drop 1) . break f
 
 -- Tests
 
