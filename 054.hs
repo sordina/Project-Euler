@@ -14,11 +14,10 @@ import Text.Groom
 
 -- Data
 
-type Hand           = [Card]
-type CardA a        = StateT [Card] (MaybeT Identity) a
-type CardU          = CardA  ()
-type CardC          = CardA  Card
-type CardF          = CardA  Classification
+type Hand    = [Card]
+type CardA a = StateT [Card] (MaybeT Identity) a
+type CardU   = CardA  ()
+type CardC   = CardA  Card
 
 data Card = Card { rank :: Rank, suit :: Suit } deriving (Show, Eq, Ord)
 data Suit = S | C | D | H                       deriving (Show, Eq, Ord, Read)
@@ -49,8 +48,8 @@ winner =   words
        >>> (hand . take 5 &&& hand . drop 5)
        >>> uncurry (>)
 
-hand :: [String] -> (Classification, [Int])
-hand = (classify &&& reverse . sort . map getRank) . map readCard
+hand :: [String] -> (Classification, Hand)
+hand = (classify &&& reverse . sort) . map readCard
 
 readCard :: String -> Card
 readCard [r,s] = Card (readRank [r]) (read [s])
@@ -65,6 +64,7 @@ readRank = Rank . p
     p "Q" = 12
     p "K" = 13
     p "A" = 14
+    p "1" = 14
     p x   = read x
 
 classify :: Hand -> Classification
@@ -72,7 +72,7 @@ classify hnd = fromMaybe (highest hnd) (join $ find isJust evaluated)
    where
     evaluated  = map (runIdentity . runMaybeT . flip evalStateT hnd) classifications
 
-classifications :: [ CardF ]
+classifications :: [ CardA Classification ]
 classifications = [ do sameSuit
                        has 14
                        _ <- run
@@ -117,20 +117,20 @@ sameSuit :: CardU
 sameSuit = get >>= samaSama . map suit
 
 has :: Int -> CardU
-has r = get >>= guard . isJust . find ((==r) . getRank)
+has r = get >>= guard . isJust . find ((==r) . getRankInt)
 
-getRank :: Card -> Int
-getRank = unRank . rank
+getRankInt :: Card -> Int
+getRankInt = unRank . rank
 
 run :: CardC
-run = do cards <- gets $ map getRank >>> sort >>> zipWith (+) [1,0..]
+run = do cards <- gets $ map getRankInt >>> sort >>> zipWith (+) [1,0..]
          samaSama cards
          best
 
 kind :: Int -> CardC
 kind n = do cards    <- gets $ groupBy ((==) `on` rank) . sortBy (comparing rank)
             matched  <- maybeFail $ find ((==n) . length) cards
-            put       $ concat . filter ((/= n) . length) $ cards
+            put       $ concat . deleteWhen ((==n) . length) $ cards
             maybeFail $ listToMaybe $ matched
 
 samaSama :: Eq x => [x] -> CardU
@@ -143,14 +143,40 @@ maybeFail :: Maybe a -> CardA a
 maybeFail (Just a) = return a
 maybeFail Nothing  = mzero
 
+deleteWhen :: (a -> Bool) -> [a] -> [a]
+deleteWhen _ []                 = []
+deleteWhen f (x:xs) | f x       = xs
+                    | otherwise = x : deleteWhen f xs
+
 -- Tests
 
 tests :: IO ()
 tests = mapM_ (uncurry test) [(False, "5H 5C 6S 7S KD 2C 3S 8S 8D TD")
-                             ,(True,  "5D 8C 9S JS AC 2C 5C 7D 8S QH")
+                             ,(True , "5D 8C 9S JS AC 2C 5C 7D 8S QH")
                              ,(False, "2D 9C AS AH AC 3D 6D 7D TD QD")
-                             ,(True,  "4D 6S 9H QH QC 3D 6D 7H QD QS")
-                             ,(True,  "2H 2D 4C 4D 4S 3C 3D 3S 9S 9D")]
+                             ,(True , "4D 6S 9H QH QC 3D 6D 7H QD QS")
+                             ,(True , "2H 2D 4C 4D 4S 3C 3D 3S 9S 9D")
+                             ,(False, "JS QH 9C AS 5C QS JC 3D QC 7C")  -- JS QH 9C AS 5C high A  <  QS JC 3D QC 7C pair Q
+                             ,(True , "JC 9C KH JH QS QC 2C TS 3D AD")  -- JC 9C KH JH QS pair J  >  QC 2C TS 3D AD high A
+                             ,(True , "5D JH AC 5C 9S TS 4C JD 8C KS")  -- 5D JH AC 5C 9S pair 5  >  TS 4C JD 8C KS high K
+                             ,(False, "KC AS 2D KH 9H 2C 5S 4D 3D 6H")  -- KC AS 2D KH 9H pair K  <  2C 5S 4D 3D 6H straight
+                             ,(False, "TH AH 2D 8S JC 3D 8C QH 7S 3S")  -- TH AH 2D 8S JC high A  <  3D 8C QH 7S 3S pair 3
+                             ,(False, "1H 2H 3D 4S 5C 2D 3C 4H 5S 6S")  -- Straight 5             <  Straight 6
+                             ,(False, "AH 2D 3S 4C 5C 3D 3C 4H 5S 6S")  -- High A                 <  Pair
+                             ,(True , "2H 3D 4S 5C 6C 3D 3C 4H 5S 6S")  -- Straight               >  Pair
+                             ,(True , "2H 3D 4S 5C 8C 2D 3C 4H 5S 7S")  -- High 8                 >  High 7
+                             ,(True , "1C 2C 3C 4C 5C 2D 3C 4H 5S 6S")  -- StraightFlush          >  Straight
+                             ,(False, "KH JS 4H 5D 9D TC TD QC JD TS")  -- High K                 <  Three T
+                             ,(True , "QS QD AC AD 4C 6S 2D AS 3H KC")
+                             ,(False, "4C 7C 3C TD QS 9C KC AS 8D AD")  -- High Q                 <  Pair A
+                             ,(False, "KC 7H QC 6D 8H 6S 5S AH 7S 8C")  -- High K                 <  High A
+                             ,(False, "3S AD 9H JC 6D JD AS KH 6S JH")  -- High A                 <  Pair J
+                             ,(False, "AD 3D TS KS 7H JH 2D JS QD AC")  -- High A                 <  Pair J
+                             ,(False, "9C JD 7C 6D TC 6H 6C JC 3D 3S")  -- High J                 <  Pair 3
+                             ,(True , "QC KC 3S JC KD 2C 8D AH QS TS")
+                             ,(True , "AS KD 3D JD 8H 7C 8C 5C QD 6C")
+                             ,(False, "8H QD 4H JC AS KH KS 3C 9S 6D")] -- 8H QD 4H JC AS high A  <  KH KS 3C 9S 6D pair K
+
 
   where
 
