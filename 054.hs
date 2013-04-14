@@ -9,15 +9,7 @@ import Data.Ord
 import Data.Function
 import Text.Groom
 
--- | TODO: Use read instances instead for better succinctness -
--- | http://stackoverflow.com/questions/5520940/creating-instance-of-read-type-class-in-haskell-for-custom-data-type
-
 -- Data
-
-type Hand    = [Card]
-type CardA a = StateT [Card] (MaybeT Identity) a
-type CardU   = CardA  ()
-type CardC   = CardA  Card
 
 data Card = Card { rank :: Rank, suit :: Suit } deriving (Show, Eq, Ord)
 data Suit = S | C | D | H                       deriving (Show, Eq, Ord, Read)
@@ -35,7 +27,31 @@ data Classification = HighCard      Rank       --  Highest value card.
                     | RoyalFlush               --  Ten, Jack, Queen, King, Ace, in same suit.
                     deriving (Eq, Ord, Show)
 
--- Functions
+-- Types
+
+type Hand    = [Card]
+type CardA a = StateT [Card] (MaybeT Identity) a
+type CardU   = CardA  ()
+type CardC   = CardA  Card
+
+-- Instances
+
+instance Read Card where
+  readsPrec _ [r,s] = [ (Card (read [r]) (read [s]), "" ) ]
+  readsPrec _ _     = [ ]
+
+instance Read Rank where
+  readsPrec _ l@[_] = [ (Rank (p l), "") ] where p :: String -> Int
+                                                 p "T" = 10
+                                                 p "J" = 11
+                                                 p "Q" = 12
+                                                 p "K" = 13
+                                                 p "A" = 14
+                                                 p "1" = 14
+                                                 p x   = read x
+  readsPrec _ _ = [ ]
+
+-- Main Program
 
 main :: IO ()
 main = getRows >>= print . length . filter winner
@@ -48,24 +64,11 @@ winner =   words
        >>> (hand . take 5 &&& hand . drop 5)
        >>> uncurry (>)
 
+-- We don't actually need the hand for the Euler problem, but it does help for edge-cases
 hand :: [String] -> (Classification, Hand)
-hand = (classify &&& reverse . sort) . map readCard
+hand = (classify &&& reverse . sort) . map read
 
-readCard :: String -> Card
-readCard [r,s] = Card (readRank [r]) (read [s])
-readCard c     = error $ "Invalid Card " ++ c
-
-readRank :: String -> Rank
-readRank = Rank . p
-  where
-    p :: String -> Int
-    p "T" = 10
-    p "J" = 11
-    p "Q" = 12
-    p "K" = 13
-    p "A" = 14
-    p "1" = 14
-    p x   = read x
+-- The rules of poker hand classification!
 
 classify :: Hand -> Classification
 classify hnd = fromMaybe (highest hnd) (join $ find isJust evaluated)
@@ -106,6 +109,8 @@ classifications = [ do sameSuit
                   , do top1 <- kind 2
                        return $ OnePair $ rank top1
                   ]
+
+-- Helpers
 
 highest :: Hand -> Classification
 highest = HighCard . rank . maximum
