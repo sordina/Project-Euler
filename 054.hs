@@ -185,9 +185,8 @@ tests = mapM_ (uncurry test) [(False, "5H 5C 6S 7S KD 2C 3S 8S 8D TD")
   where
 
     test :: Bool -> String -> IO ()
-    test b s = if b == winner s then print $ "Test Passed"
-                                else do
-                                  print $ "Test Failed: " ++ s
-                                  putStrLn $ groom $ hands s
+    test b s = if b == winner s then    print    $ "Test Passed"
+                                else do print    $ "Test Failed: " ++ s
+                                        putStrLn $ groom $ hands s
 
     hands = words >>> (hand . take 5 &&& hand . drop 5)
