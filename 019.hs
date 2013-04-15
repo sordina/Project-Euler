@@ -37,7 +37,7 @@ monthDays October   _     = 31
 monthDays November  _     = 30
 monthDays December  _     = 31
 
-main = print $ length $ filter id $ map valid dayItems
+main = print $ length $ filter valid dayItems
 
 valid (Sunday, 1) = True
 valid _           = False
